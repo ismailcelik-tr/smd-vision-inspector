@@ -34,3 +34,10 @@ uv run mypy
 
 Üretim görüntüleri ve ürün recipe'leri firmaya özeldir ve bu repoda bulunmaz. Testler
 sentetik görüntüler kullanır.
+
+## Lisans
+
+[PolyForm Noncommercial 1.0.0](LICENSE). Ticari olmayan kullanım serbesttir. Ticari
+kullanım için telif hakkı sahibinden ayrıca lisans alınması gerekir; bir issue açın ya da
+[@ismailcelik-tr](https://github.com/ismailcelik-tr) ile iletişime geçin. Bağlayıcı olan
+İngilizce lisans metnidir.

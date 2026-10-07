@@ -33,3 +33,9 @@ uv run mypy
 
 Production images and product recipes are proprietary and not part of this repository.
 Tests use synthetic images.
+
+## License
+
+[PolyForm Noncommercial 1.0.0](LICENSE). Free for noncommercial use. Commercial use
+requires a separate license from the copyright holder; open an issue or contact
+[@ismailcelik-tr](https://github.com/ismailcelik-tr).
