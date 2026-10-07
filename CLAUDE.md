@@ -4,11 +4,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project State
 
-Pre-MVP. No application code, packaging, or test tooling exists yet. Build, lint,
-and test commands will be added here once the toolchain is set up.
+Pre-MVP. Scaffolding only; no inspection pipeline yet.
 
 `PROJECT_BRIEF.md` is the source of truth for scope, defect types, and
 long-term capabilities. Read it before planning work.
+
+## Commands
+
+```bash
+uv sync                                  # install
+uv run pytest                            # all tests
+uv run pytest tests/test_log.py::test_filters_below_level   # single test
+uv run pytest -m real_data               # local-only, needs samples/
+uv run ruff check . && uv run ruff format --check .
+uv run mypy                              # strict
+```
+
+Production target is Windows; CI runs on Windows and Ubuntu.
 
 ## Language
 
