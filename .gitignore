@@ -1,0 +1,21 @@
+# Local-only data, synced outside git (may be symlinks, so no trailing slash)
+samples
+datasets
+runs
+recipes.local
+SYNC.local.md
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+*.egg-info/
+
+# OS
+.DS_Store
+Thumbs.db
