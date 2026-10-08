@@ -2,11 +2,20 @@ from pathlib import Path
 
 import pytest
 
-from smd_vision_inspector.recipe import merge_placements, read_bom, read_ssa, reconcile
+from smd_vision_inspector.recipe import (
+    PartKind,
+    load_recipe,
+    merge_placements,
+    read_bom,
+    read_ssa,
+    reconcile,
+)
 
 pytestmark = pytest.mark.real_data
 
-KARVOX = Path(__file__).parents[1] / "bom" / "karvox43"
+ROOT = Path(__file__).parents[1]
+KARVOX = ROOT / "bom" / "karvox43"
+KARVOX_RECIPE = ROOT / "recipes.local" / "karvox43" / "recipe.yaml"
 KARVOX_PROGRAMS = ("SM471_62600BUTONLU.ssa", "SM482_62600BUTONLU.ssa")
 KARVOX_SMD_COUNT = 204
 KARVOX_BOM = "Y.E.KAY.66803.xlsx"
@@ -38,3 +47,12 @@ def test_karvox_bom_differs_from_button_variant_as_known() -> None:
     assert result.unplaced == ("C18", "C53", "KN1", "KN9", "RL1", "U7", "U8")
     assert result.unlisted == ("SW6", "SW7", "SW8", "SW9", "SW10")
     assert [line.refdes for line in result.quantity_mismatches] == [("R12", "R84")]
+
+
+def test_karvox_recipe_resolves_every_part() -> None:
+    recipe = load_recipe(_require(KARVOX_RECIPE))
+
+    ics = sorted(t.refdes for t in recipe.targets if t.kind is PartKind.IC)
+
+    assert len(recipe.targets) == KARVOX_SMD_COUNT
+    assert ics == ["IC1", "IC2", "IC3", "U1", "U2", "U3", "U4", "U6"]

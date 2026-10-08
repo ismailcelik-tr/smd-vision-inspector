@@ -8,6 +8,8 @@ license = "PolyForm-Noncommercial-1.0.0"
 license-files = ["LICENSE.md"]
 dependencies = [
     "openpyxl>=3.1.5",
+    "pydantic>=2.13.5",
+    "pyyaml>=6.0.3",
     "structlog>=26.1.0",
 ]
 
@@ -45,4 +47,5 @@ dev = [
     "pytest>=9.1.1",
     "ruff>=0.16.10",
     "types-openpyxl>=3.1.5.20260827",
+    "types-pyyaml>=6.0.12.20260906",
 ]
