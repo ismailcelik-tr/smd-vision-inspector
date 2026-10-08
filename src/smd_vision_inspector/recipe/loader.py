@@ -8,6 +8,7 @@ import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from smd_vision_inspector.recipe.bom import read_bom
+from smd_vision_inspector.recipe.geometry import BoardGeometry
 from smd_vision_inspector.recipe.packages import Package, PackageLibrary
 from smd_vision_inspector.recipe.ssa import merge_placements, read_ssa
 from smd_vision_inspector.recipe.targets import InspectionTarget, OrientationCheck, build_targets
@@ -19,6 +20,7 @@ __all__ = ["Recipe", "load_library", "load_recipe"]
 class Recipe:
     product: str
     board_size_mm: tuple[float, float]
+    geometry: BoardGeometry
     targets: tuple[InspectionTarget, ...]
 
 
@@ -44,9 +46,17 @@ class _LibraryFile(_Strict):
         return self
 
 
+class _GeometryEntry(_Strict):
+    panel_origin_mm: tuple[float, float]
+    panel_size_mm: tuple[float, float]
+    fiducials_mm: tuple[tuple[float, float], ...] = Field(min_length=4)
+    fiducial_ring_mm: float
+
+
 class _RecipeFile(_Strict):
     product: str
     board_size_mm: tuple[float, float]
+    geometry: _GeometryEntry
     library: Path
     programs: list[Path] = Field(min_length=1)
     bom: Path | None = None
@@ -78,7 +88,12 @@ def load_recipe(path: Path) -> Recipe:
         file.orientation_overrides,
     )
 
-    return Recipe(product=file.product, board_size_mm=file.board_size_mm, targets=targets)
+    return Recipe(
+        product=file.product,
+        board_size_mm=file.board_size_mm,
+        geometry=BoardGeometry(**file.geometry.model_dump()),
+        targets=targets,
+    )
 
 
 def _read_yaml(path: Path) -> object:

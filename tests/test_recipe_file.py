@@ -4,6 +4,7 @@ import openpyxl
 import pytest
 
 from smd_vision_inspector.recipe import (
+    BoardGeometry,
     OrientationCheck,
     Package,
     PartKind,
@@ -38,6 +39,11 @@ PCB Size = 50.000, 30.000, 1.600
 RECIPE = """
 product: demo
 board_size_mm: [50.0, 30.0]
+geometry:
+  panel_origin_mm: [-5.0, -5.0]
+  panel_size_mm: [60.0, 40.0]
+  fiducials_mm: [[2.0, 28.0], [48.0, 2.0], [10.0, 5.0], [40.0, 25.0]]
+  fiducial_ring_mm: 1.95
 library: ../library.yaml
 programs: [demo.ssa]
 bom: demo.xlsx
@@ -93,6 +99,19 @@ def test_recipe_builds_targets_relative_to_its_file(recipe_dir: Path) -> None:
     ]
 
 
+def test_recipe_reads_board_geometry(recipe_dir: Path) -> None:
+    (recipe_dir / "recipe.yaml").write_text(RECIPE)
+
+    recipe = load_recipe(recipe_dir / "recipe.yaml")
+
+    assert recipe.geometry == BoardGeometry(
+        panel_origin_mm=(-5.0, -5.0),
+        panel_size_mm=(60.0, 40.0),
+        fiducials_mm=((2.0, 28.0), (48.0, 2.0), (10.0, 5.0), (40.0, 25.0)),
+        fiducial_ring_mm=1.95,
+    )
+
+
 def test_recipe_applies_overrides(recipe_dir: Path) -> None:
     overrides = "package_overrides: {R1: '1210'}\norientation_overrides: {IC1: half_turn}\n"
     (recipe_dir / "recipe.yaml").write_text(RECIPE + overrides)
@@ -107,4 +126,12 @@ def test_recipe_rejects_unknown_key(recipe_dir: Path) -> None:
     (recipe_dir / "recipe.yaml").write_text(RECIPE + "thresholds: {}\n")
 
     with pytest.raises(ValueError, match="thresholds"):
+        load_recipe(recipe_dir / "recipe.yaml")
+
+
+def test_recipe_needs_four_fiducials_for_a_homography(recipe_dir: Path) -> None:
+    text = RECIPE.replace(", [10.0, 5.0], [40.0, 25.0]", "")
+    (recipe_dir / "recipe.yaml").write_text(text)
+
+    with pytest.raises(ValueError, match="fiducials_mm"):
         load_recipe(recipe_dir / "recipe.yaml")

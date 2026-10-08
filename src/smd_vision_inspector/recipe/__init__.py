@@ -7,6 +7,7 @@ from smd_vision_inspector.recipe.bom import (
     read_bom,
     reconcile,
 )
+from smd_vision_inspector.recipe.geometry import BoardGeometry
 from smd_vision_inspector.recipe.loader import Recipe, load_library, load_recipe
 from smd_vision_inspector.recipe.packages import Package, PackageLibrary
 from smd_vision_inspector.recipe.parts import PartKind, kind_of
@@ -15,6 +16,7 @@ from smd_vision_inspector.recipe.ssa import SsaProgram, merge_placements, parse_
 from smd_vision_inspector.recipe.targets import InspectionTarget, OrientationCheck, build_targets
 
 __all__ = [
+    "BoardGeometry",
     "BomLine",
     "InspectionTarget",
     "OrientationCheck",
