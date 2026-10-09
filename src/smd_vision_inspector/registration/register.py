@@ -102,16 +102,18 @@ def _find_panel(gray: NDArray[np.uint8]) -> NDArray[np.float64]:
     kernel = np.ones((_OUTLINE_CLOSE_PX, _OUTLINE_CLOSE_PX), np.uint8)
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
 
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    if not contours:
+    # CCOMP: a panel in the hole of a bright ring (table around a dark pad) is outer too.
+    contours, hierarchy = cv2.findContours(mask, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+    outer = [c for i, c in enumerate(contours) if hierarchy[0][i][3] < 0]
+    large = [c for c in outer if cv2.contourArea(c) >= _MIN_PANEL_AREA * gray.size]
+    if not large:
         raise RegistrationError("panel not found")
 
-    outline = max(contours, key=cv2.contourArea)
-    if cv2.contourArea(outline) < _MIN_PANEL_AREA * gray.size:
-        raise RegistrationError("panel not found")
-
-    if _touches_edge(outline, gray.shape):
+    inside = [c for c in large if not _touches_edge(c, gray.shape)]
+    if not inside:
         raise RegistrationError("panel touches the photo edge")
+
+    outline = max(inside, key=cv2.contourArea)
 
     hull = cv2.convexHull(outline)
     perimeter = cv2.arcLength(hull, True)

@@ -67,6 +67,18 @@ def test_rejects_panel_cut_by_photo_edge() -> None:
         register(photo, GEOMETRY)
 
 
+def test_ignores_bright_surroundings_at_photo_edge() -> None:
+    """Dark pad on a white table: the table touches the photo edge, the panel does not."""
+    photo, truth = photograph(*render_truth(), TILTED)
+    table = np.full_like(photo, 230)
+    cv2.rectangle(table, (60, 60), (photo.shape[1] - 60, photo.shape[0] - 60), 0, -1)
+    photo = np.maximum(photo, table)
+
+    registration = register(photo, GEOMETRY)
+
+    assert _max_error_mm(registration.homography, truth) < MAX_ERROR_MM
+
+
 def test_rejects_panel_without_fiducials() -> None:
     truth, frame = render_truth(replace(GEOMETRY, fiducials_mm=()))
     photo, _ = photograph(truth, frame, TILTED)
